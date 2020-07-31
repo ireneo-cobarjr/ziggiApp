@@ -14,6 +14,10 @@ npm run dev
 
 ### Lint the files
 ```bash
+npm run lint
+```
+### Fix linting issues
+```bash
 npm run lint -- --fix
 ```
 
@@ -22,7 +26,7 @@ npm run lint -- --fix
 npm run build
 ```
 ##### Cordova Errors on build
-If ever you encounter cordova related errors such as `Failed to install 'cordova-plugin-whitelist'`
+If ever you encounter cordova related errors such as `Failed to install 'cordova-plugin-whitelist'`.
 You may run:
 ```bash
 npm run prepare-cordova
@@ -51,8 +55,8 @@ This will create a signed android app. By default the name of the app will be zi
 ```
 Where `app_name` could be any valid name of the apk file.
 
-#### Complete build for android using convenience scripts
-A `build-complete` script is defined on package.json. This script uses the convenience scripts mentioned.
+### Complete build for android using convenience scripts
+A `build-complete` script is defined on package.json. This script uses the convenience scripts mentioned. This script will run `npm run build`, then creates a signing key if it doesnt exist, sign the app and zip-align it.
 To use this, just run:
 ```bash
 npm run build-complete
