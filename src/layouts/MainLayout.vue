@@ -25,7 +25,7 @@
             <q-icon v-if="searchTerm !== ''" name="close" @click="searchTerm = ''" class="cursor-pointer" />
           </template>
           <template v-slot:after>
-            <q-btn unelevated color="secondary" icon="search" />
+            <q-btn unelevated color="secondary" icon="search" @click="onSearch"/>
           </template>
         </q-input>
       </div>
@@ -53,7 +53,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :searchTerm="searchTerm" />
+      <router-view :filtered="filtered" />
     </q-page-container>
   </q-layout>
 </template>
@@ -113,8 +113,17 @@ export default {
     return {
       searchTerm: '',
       leftDrawerOpen: false,
+      filtered: [],
       essentialLinks: linksData
     }
+  },
+  methods: {
+    onSearch () {
+      this.filtered = this.$store.getters['products/searchProducts'](this.searchTerm)
+    }
+  },
+  created () {
+    this.onSearch()
   }
 }
 </script>
