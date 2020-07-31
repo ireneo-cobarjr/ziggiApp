@@ -21,6 +21,13 @@ npm run lint -- --fix
 ```bash
 npm run build
 ```
+##### Cordova Errors on build
+If ever you encounter cordova related errors such as `Failed to install 'cordova-plugin-whitelist'`
+You may run:
+```bash
+npm run prepare-cordova
+```
+
 ### Convenience scripts
 The files __create-key__ and __sign-android__ are created for convenience on building android apps. If you want to use them, nake sure they are executale. 
 ```bash
