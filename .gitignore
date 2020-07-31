@@ -34,3 +34,6 @@ yarn-error.log*
 
 #project specific
 signing-key/
+
+#cordova
+/src-cordova
