@@ -1,0 +1,7 @@
+#! /bin/bash
+
+SKEY="signing-key/my-release-key.keystore"
+if [ -f "$SKEY" ]; then
+  echo 'signing-key already exists'
+else mkdir signing-key && cd signing-key && keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 20000 && cd .. && echo "signing-key created!"
+fi

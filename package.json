@@ -8,9 +8,11 @@
   "scripts": {
     "dev": "quasar dev",
     "build": "quasar build -m android",
+    "build-complete": "quasar build -m android && ./create-key && ./sign-android ${NAME:-ziggiapp}",
     "clean": "quasar clean",
+    "prepare-cordova": "cd src-cordova && cordova prepare && cd ..",
     "lint": "eslint --ext .js,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"$npm_config_test\" && exit 0"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
