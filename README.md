@@ -29,7 +29,7 @@ npm run prepare-cordova
 ```
 
 ### Convenience scripts
-The files __create-key__ and __sign-android__ are created for convenience on building android apps. If you want to use them, nake sure they are executale. 
+The files __create-key__ and __sign-android__ are created for convenience on building android apps. If you want to use them, make sure they are executale. 
 ```bash
 chmod +x create-key sign-android
 ```
@@ -45,7 +45,7 @@ Use this script to sign the unsigned built android app. This will also zip-align
 ```bash
 ./sign-android
 ```
-This will create a signed android app. By default the name of the app will be ziggiapp.apk but if you need to make it into a different name, jusr run:
+This will create a signed android app. By default the name of the app will be ziggiapp.apk but if you need to make it into a different name, just run:
 ```bash
 ./sign-android app_name
 ```
