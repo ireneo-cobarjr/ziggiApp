@@ -123,6 +123,7 @@ export default {
     }
   },
   created () {
+    this.$store.dispatch('products/getProducts', this)
     this.onSearch()
   }
 }
