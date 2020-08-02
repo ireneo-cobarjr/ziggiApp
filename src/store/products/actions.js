@@ -1,16 +1,18 @@
-export function getProducts ({ commit, state }, vm) {
-  vm.$axios.get(vm.$API.products, {
+import { instance as axios, api } from 'boot/axios'
+
+export async function getProducts ({ commit, rootState }) {
+  await axios.get(api.products, {
     params: {
       XDEBUG_SESSION_START: 'PHPSTORM'
     },
     headers: {
-      Authorization: `Bearer ${state.token}`
+      Authorization: `Bearer ${rootState.auth.token}`
     }
   })
     .then(
       r => {
         commit('getProducts', r.data)
-        commit('setData')
+        return true
       }
     )
     .catch(

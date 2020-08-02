@@ -4,8 +4,12 @@ const routes = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue') }
+      { path: '', component: () => import('pages/Index.vue'), meta: { isSecured: true } }
     ]
+  },
+  {
+    path: '/Auth/login',
+    component: () => import('pages/Auth/Login.vue')
   },
 
   // Always leave this as last one,

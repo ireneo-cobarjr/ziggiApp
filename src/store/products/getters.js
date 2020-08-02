@@ -5,7 +5,7 @@ export function searchProducts (state) {
     } else {
       const patt = new RegExp(searchTerm, 'i')
       return state.products.filter(product => {
-        return patt.test(product.title)
+        return patt.test(product.name)
       })
     }
   }
