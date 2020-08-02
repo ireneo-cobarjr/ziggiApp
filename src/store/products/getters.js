@@ -1,12 +1,23 @@
 export function searchProducts (state) {
-  return (searchTerm) => {
+  return (searchTerm, filter) => {
+    const categories = filter.filter(f => f.show)
     if (searchTerm === '' || searchTerm === null) {
-      return state.products
+      return state.products.filter(product => {
+        return categories.some(category => product.category.parent_id === category.id)
+      })
     } else {
       const patt = new RegExp(searchTerm, 'i')
       return state.products.filter(product => {
-        return patt.test(product.name)
+        return patt.test(product.name) && categories.some(category => product.category.parent_id === category.id)
       })
     }
   }
+}
+
+export function getCategories (state) {
+  const filter = []
+  state.categories.forEach(c => {
+    filter.push({ name: c.name, id: c.id, show: true })
+  })
+  return filter
 }

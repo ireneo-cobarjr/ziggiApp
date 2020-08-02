@@ -49,7 +49,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :filtered="filtered" :loading="loading" />
+      <router-view :filtered="filtered" :loading="loading" :categories="categories" @checkFilters="onSearch" />
     </q-page-container>
   </q-layout>
 </template>
@@ -63,17 +63,23 @@ export default {
       searchTerm: '',
       leftDrawerOpen: false,
       filtered: [],
+      categories: [],
       loading: true
     }
   },
   methods: {
     onSearch () {
-      this.filtered = this.$store.getters['products/searchProducts'](this.searchTerm)
+      this.filtered = this.$store.getters['products/searchProducts'](this.searchTerm, this.categories)
+    },
+    getCategoryList () {
+      this.categories = this.$store.getters['products/getCategories']
     }
   },
   async created () {
     this.loading = true
     await this.$store.dispatch('products/getProducts')
+    await this.$store.dispatch('products/getCategories')
+    this.getCategoryList()
     this.onSearch()
     this.loading = false
   }

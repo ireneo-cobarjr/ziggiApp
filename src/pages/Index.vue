@@ -8,19 +8,25 @@
     </div>
     <div v-else>
         <div class="text-blue-grey-7 row justify-between q-pa-sm" >
-        <div class="q-pa-sm">{{ `${filtered.length} result(s)` }}</div>
-        <q-btn-dropdown label="Filters" dense unelevated>
-            <div class="filter-dropdown">
-            Some Filters here <br />
-            Some Filters here <br />
-            Some Filters here <br />
-            Some Filters here <br />
-            Some Filters here <br />
+        <div class="q-pa-sm">{{ `${filtered.length} ` }} result<span v-if="filtered.length > 1">s</span></div>
+        <q-btn-dropdown label="Filters" dense unelevated persistent @hide="enableList" @show="disabled = true">
+            <div class="filter-dropdown q-px-sm q-py-md">
+              <p class="text-h6">Categories</p>
+              <q-list separator>
+                <q-item clickable v-ripple v-for="category in categories" :key="category.id">
+                  <q-item-section side-top>
+                    <q-checkbox v-model="category.show" />
+                  </q-item-section>
+                  <q-item-section @click="category.show = !category.show">
+                    <q-item-label>{{ category.name }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
             </div>
         </q-btn-dropdown>
         </div>
         <q-list separator >
-        <q-item clickable v-ripple  v-for="(item, index) in filtered" :key=index class="q-py-md">
+        <q-item clickable :disable="disabled" v-ripple="!disabled"  v-for="(item, index) in filtered" :key="index" class="q-py-md">
             <q-item-section top avatar>
                 <q-avatar color="primary" text-color="white" icon="add_shopping_cart" />
             </q-item-section>
@@ -37,7 +43,18 @@
 
 <script>
 export default {
-  props: ['filtered', 'loading']
+  props: ['filtered', 'loading', 'categories'],
+  data () {
+    return {
+      disabled: false
+    }
+  },
+  methods: {
+    enableList () {
+      this.disabled = false
+      this.$emit('checkFilters')
+    }
+  }
 }
 </script>
 
@@ -46,5 +63,9 @@ export default {
       position: absolute;
       top: 40%;
       left: calc(50% - 1.5em);
+  }
+
+  .filter-dropdown {
+    width: 95vw;
   }
 </style>
