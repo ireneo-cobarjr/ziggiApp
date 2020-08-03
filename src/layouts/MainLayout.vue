@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Ziggi
+          Ziggi<span> - {{title}}</span>
         </q-toolbar-title>
 
         <div>
@@ -42,29 +42,36 @@
           header
           class="text-grey-8"
         >
-          Ziggi
+          <p class="text-primary text-h5 text-weight-bold">Ziggi</p>
         </q-item-label>
+        <Links v-for="(link, index) in links" :key="index" :title="link.title" :caption="link.caption" :link="link.link" :icon="link.icon" />
 
       </q-list>
     </q-drawer>
 
     <q-page-container>
-      <router-view :filtered="filtered" :loading="loading" :categories="categories" @checkFilters="onSearch" />
+      <router-view :filtered="filtered" :loading="loading" :categories="categories" @checkFilters="onSearch" @setTitle="onNav" />
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-
+import Links from '../components/EssentialLink.vue'
 export default {
+  components: { Links },
   name: 'MainLayout',
   data () {
     return {
+      title: '',
       searchTerm: '',
       leftDrawerOpen: false,
       filtered: [],
       categories: [],
-      loading: true
+      loading: true,
+      links: [
+        { title: 'Products', link: '/', caption: '', icon: 'shopping_basket' },
+        { title: 'Outlets', link: '/outlets', caption: '', icon: 'store' }
+      ]
     }
   },
   methods: {
@@ -73,6 +80,10 @@ export default {
     },
     getCategoryList () {
       this.categories = this.$store.getters['products/getCategories']
+    },
+    onNav (e) {
+      this.title = e
+      this.searchTerm = ''
     }
   },
   async created () {

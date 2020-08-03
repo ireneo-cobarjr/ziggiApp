@@ -1,5 +1,5 @@
 <template>
-  <q-page id="search-page">
+  <q-page>
     <div v-if="loading" class="loader-spinner">
       <q-spinner
         color="accent"
@@ -54,6 +54,9 @@ export default {
       this.disabled = false
       this.$emit('checkFilters')
     }
+  },
+  mounted () {
+    this.$emit('setTitle', 'Products')
   }
 }
 </script>
