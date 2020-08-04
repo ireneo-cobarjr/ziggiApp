@@ -14,18 +14,14 @@
       <q-chip class="q-px-xl">VAT</q-chip><br/>
       <span>{{product.vat}}</span>
     </div>
-    <p :class="['text-justify', 'q-mt-lg', {'ellipsis-3-lines': truncate}]">{{description}}</p>
-    <div class="row justify-end q-mb-lg">
-      <q-chip icon="expand_more" color="blue-grey-1" text-color="dark" @click="truncate = false">
-        Read More
-      </q-chip>
-    </div>
+    <p class="text-justify q-mt-lg">{{description}}</p>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
     <q-fab icon="add_shopping_cart" color="accent" direction="up" vertical-actions-align="right" >
         <q-fab-action color="secondary" label="Checkout" label-position="left" />
         <q-fab-action color="primary" label="Add to Cart" label-position="left" />
     </q-fab>
     </q-page-sticky>
+    <div class="spacer-bot"></div>
   </q-page>
 </template>
 
@@ -34,8 +30,7 @@ export default {
   props: ['id'],
   data () {
     return {
-      image: 'https://picsum.photos/id/1080/200/300',
-      truncate: true
+      image: 'https://picsum.photos/id/1080/200/300'
     }
   },
   computed: {
@@ -55,6 +50,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .spacer-bot {
+      height: 50px;
+  }
   .danglings {
       display: inline-block;
 
