@@ -7,7 +7,7 @@
     </q-parallax>
     <p class="text-h4 text-blue-grey-9 q-mt-md">{{product.name}}</p>
     <div class="danglings">
-      <q-chip class="q-px-md">Auto Odrder</q-chip><br/>
+      <q-chip class="q-px-md">Auto Order</q-chip><br/>
       <span>{{product.auto_order}}</span>
     </div>
     <div class="danglings q-ml-lg">
