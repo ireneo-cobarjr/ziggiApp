@@ -6,9 +6,19 @@
           flat
           dense
           round
+          icon="keyboard_backspace"
+          aria-label="Menu"
+          @click="back"
+          v-if="isSingleProduct"
+        />
+        <q-btn
+          flat
+          dense
+          round
           icon="menu"
           aria-label="Menu"
           @click="leftDrawerOpen = !leftDrawerOpen"
+          v-else
         />
 
         <q-toolbar-title>
@@ -19,7 +29,7 @@
           <q-icon name="shopping_cart" size="sm" />
         </div>
       </q-toolbar>
-      <div class="row q-px-sm q-pt-sm">
+      <div class="row q-px-sm q-pt-sm" v-if="$route.path === '/'">
         <q-input outlined bottom-slots v-model="searchTerm" placeholder="Search" :dense=true class="full-width" bg-color="white" >
           <template v-slot:append>
             <q-icon v-if="searchTerm !== ''" name="close" @click="searchTerm = ''" class="cursor-pointer" />
@@ -50,7 +60,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :filtered="filtered" :loading="loading" :categories="categories" @checkFilters="onSearch" @setTitle="onNav" />
+      <router-view :filtered="filtered" :loading="loading" :categories="categories" @checkFilters="onSearch" @setTitle="onNav" @singleProduct="isSingleProduct = $event" />
     </q-page-container>
   </q-layout>
 </template>
@@ -68,6 +78,7 @@ export default {
       filtered: [],
       categories: [],
       loading: true,
+      isSingleProduct: false,
       links: [
         { title: 'Products', link: '/', caption: '', icon: 'shopping_basket' },
         { title: 'Outlets', link: '/outlets', caption: '', icon: 'store' }
@@ -84,6 +95,10 @@ export default {
     onNav (e) {
       this.title = e
       this.searchTerm = ''
+    },
+    back () {
+      this.isSingleProduct = false
+      this.$router.go(-1)
     }
   },
   async created () {

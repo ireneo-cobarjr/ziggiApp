@@ -26,16 +26,16 @@
         </q-btn-dropdown>
         </div>
         <q-list separator >
-        <q-item clickable :disable="disabled" v-ripple="!disabled"  v-for="(item, index) in filtered" :key="index" class="q-py-md">
-            <q-item-section top avatar>
-                <q-avatar color="primary" text-color="white" icon="add_shopping_cart" />
-            </q-item-section>
-            <q-item-section>
-                <q-item-label class="text-weight-bold">{{item.name}}</q-item-label>
-                <q-item-label caption>{{`Auto Order: ${item.auto_order}`}}</q-item-label>
-                <q-item-label caption>{{`VAT: ${item.vat}`}}</q-item-label>
-            </q-item-section>
-        </q-item>
+          <q-item clickable :disable="disabled" v-ripple="!disabled"  v-for="(item, index) in filtered" :key="index" class="q-py-md" @click="$router.push(`product/:${item.id}`)">
+              <q-item-section top avatar>
+                  <q-avatar color="primary" text-color="white" icon="add_shopping_cart" />
+              </q-item-section>
+              <q-item-section>
+                  <q-item-label class="text-weight-bold">{{item.name}}</q-item-label>
+                  <q-item-label caption>{{`Auto Order: ${item.auto_order}`}}</q-item-label>
+                  <q-item-label caption>{{`VAT: ${item.vat}`}}</q-item-label>
+              </q-item-section>
+          </q-item>
         </q-list>
     </div>
   </q-page>

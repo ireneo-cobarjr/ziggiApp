@@ -21,3 +21,10 @@ export function getCategories (state) {
   })
   return filter
 }
+
+export function getProduct (state) {
+  return (id) => {
+    const pid = id.split(':')
+    return state.products.find(p => `${p.id}` === `${pid[1]}`)
+  }
+}
