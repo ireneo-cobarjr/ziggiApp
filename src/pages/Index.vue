@@ -12,21 +12,12 @@
         <q-btn-dropdown label="Filters" dense unelevated persistent @hide="enableList" @show="disabled = true">
             <div class="filter-dropdown q-px-sm q-py-md">
               <p class="text-h6">Categories</p>
-              <q-list separator>
-                <q-item clickable v-ripple v-for="category in categories" :key="category.id">
-                  <q-item-section side-top>
-                    <q-checkbox v-model="category.show" />
-                  </q-item-section>
-                  <q-item-section @click="category.show = !category.show">
-                    <q-item-label>{{ category.name }}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
+              <categories-tree :categories="categories" @ticked="getTicks" @SetTicked="getTicks" />
             </div>
         </q-btn-dropdown>
         </div>
         <q-list separator >
-          <q-item clickable :disable="disabled" v-ripple="!disabled"  v-for="(item, index) in filtered" :key="index" class="q-py-md" @click="$router.push(`product/:${item.id}`)">
+          <q-item clickable :disable="disabled" v-ripple="!disabled"  v-for="(item, index) in filtered" :key="index" class="q-py-md" @click="$router.push(`product/:${item.id}`)" >
               <q-item-section top avatar>
                   <q-avatar color="primary" text-color="white" icon="add_shopping_cart" />
               </q-item-section>
@@ -42,17 +33,27 @@
 </template>
 
 <script>
+import CategoriesTree from '../components/Categories.vue'
+
 export default {
   props: ['filtered', 'loading', 'categories'],
+  components: {
+    CategoriesTree
+  },
   data () {
     return {
-      disabled: false
+      disabled: false,
+      ticks: []
     }
   },
   methods: {
     enableList () {
       this.disabled = false
-      this.$emit('checkFilters')
+      this.$emit('checkFilters', this.ticks)
+    },
+    getTicks (e) {
+      this.ticks = e
+      this.$emit('SetTicked', e)
     }
   },
   mounted () {

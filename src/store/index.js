@@ -23,11 +23,11 @@ export default function (/* { ssrContext } */) {
       outlets,
       products,
       auth
-    },
+    }
 
     // enable strict mode (adds overhead!)
     // for dev mode only
-    strict: process.env.DEV
+    // strict: process.env.DEV
   })
 
   return Store

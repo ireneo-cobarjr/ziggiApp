@@ -60,7 +60,16 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :filtered="filtered" :loading="loading" :categories="categories" @checkFilters="onSearch" @setTitle="onNav" @singleProduct="isSingleProduct = $event" />
+      <router-view
+      :filtered="filtered"
+      :loading="loading"
+      :categories="categories"
+      @checkFilters="onFilter"
+      @SetTicked="tmp = $event"
+      @setTitle="onNav"
+      @singleProduct="isSingleProduct = $event"
+      />
+
     </q-page-container>
   </q-layout>
 </template>
@@ -73,6 +82,7 @@ export default {
   data () {
     return {
       title: '',
+      tmp: [],
       searchTerm: '',
       leftDrawerOpen: false,
       filtered: [],
@@ -87,10 +97,25 @@ export default {
   },
   methods: {
     onSearch () {
-      this.filtered = this.$store.getters['products/searchProducts'](this.searchTerm, this.categories)
-    },
-    getCategoryList () {
       this.categories = this.$store.getters['products/getCategories']
+      this.filtered = this.$store.getters['products/searchProducts'](this.searchTerm, this.tmp)
+      this.categories = this.$store.getters['products/setCategories'](this.filtered)
+    },
+    onFilter (f) {
+      // this.filtered = this.$store.getters['products/searchProducts'](this.searchTerm, f)
+      this.filtered = this.$store.getters['products/updateProducts'](f, this.filtered)
+      this.categories = this.$store.getters['products/updateCategories'](f, this.categories)
+    },
+    updateCategories () {
+      this.tmp = []
+      const x = this.categories
+      x.forEach(y => {
+        y.sub_category.forEach(s => {
+          if (s.show) {
+            this.tmp.push(s.id)
+          }
+        })
+      })
     },
     onNav (e) {
       this.title = e
@@ -105,8 +130,8 @@ export default {
     this.loading = true
     await this.$store.dispatch('products/getProducts')
     await this.$store.dispatch('products/getCategories')
-    this.getCategoryList()
     this.onSearch()
+    this.updateCategories()
     this.loading = false
   }
 }

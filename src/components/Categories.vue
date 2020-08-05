@@ -1,24 +1,26 @@
 <template>
   <q-tree
-  :nodes="categories"
+  :nodes="treeCategories"
   node-key="id"
   tick-strategy="leaf"
   :ticked.sync="ticked"
   no-connectors
+  :accordion="true"
+  @update:ticked="$emit('ticked', $event)"
   />
 </template>
 
 <script>
 export default {
+  props: ['categories'],
   data () {
     return {
       ticked: []
     }
   },
   computed: {
-    categories () {
-      const categories = this.$store.getters['products/getCategories']
-      return this.buildTree(categories)
+    treeCategories () {
+      return this.buildTree(this.categories)
     }
   },
   methods: {
@@ -33,14 +35,23 @@ export default {
       })
       return tree
     },
-    setTicks (c) {
-      c.forEach(d => {
-        if (d.show) { this.ticked.push(d.id) }
+    setTicks () {
+      this.ticked = []
+      const x = this.categories
+      x.forEach(y => {
+        y.sub_category.forEach(s => {
+          if (s.show) {
+            this.ticked.push(s.id)
+          }
+        })
       })
     }
   },
+  created () {
+    this.setTicks()
+  },
   mounted () {
-    this.setTicks(this.categories)
+    this.$emit('SetTicked', this.ticked)
   }
 }
 </script>
