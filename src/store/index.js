@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 // import store modules
 import outlets from './outlets'
 import products from './products'
+import brand from './brand'
 import auth from './auth'
 
 Vue.use(Vuex)
@@ -22,6 +23,7 @@ export default function (/* { ssrContext } */) {
     modules: {
       outlets,
       products,
+      brand,
       auth
     }
 

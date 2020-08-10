@@ -12,7 +12,11 @@ const api = {
   login: '/login',
   products: '/customer/sku/list',
   categories: '/customer/category/list',
-  outlets: '/outlet/list'
+  outlets: '/outlet/list',
+  brand: {
+    sku: '/brand/sku/list',
+    categories: '/brand/category/list'
+  }
 }
 
 export { instance, api }
