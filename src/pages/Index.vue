@@ -9,7 +9,7 @@
     <div v-else>
         <div class="text-blue-grey-7 row justify-between q-pa-sm" >
         <div class="q-pa-sm">{{ `${filtered.length} ` }} result<span v-if="filtered.length > 1">s</span></div>
-        <q-btn-dropdown label="Filters" dense unelevated persistent @hide="disabled =false" @show="disabled = true" ref="fb">
+        <q-btn-dropdown label="Filters" dense unelevated persistent @hide="hideFilters" @show="showFilters" ref="fb">
             <div class="filter-dropdown q-px-sm q-py-md">
               <div class="row justify-between">
                 <p class="text-h6">Filters</p>
@@ -103,6 +103,14 @@ export default {
     reset () {
       this.$refs.fb.hide()
       this.$emit('reset')
+    },
+    showFilters () {
+      this.disabled = true
+      this.$emit('FiltersVisible', this.disabled)
+    },
+    hideFilters () {
+      this.disabled = false
+      this.$emit('FiltersVisible', this.disabled)
     }
   },
   mounted () {

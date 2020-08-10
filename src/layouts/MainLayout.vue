@@ -30,12 +30,12 @@
         </div>
       </q-toolbar>
       <div class="row q-px-sm q-pt-sm" v-if="$route.path === '/'">
-        <q-input outlined bottom-slots v-model="searchTerm" placeholder="Search" :dense=true class="full-width" bg-color="white" >
+        <q-input outlined bottom-slots v-model="searchTerm" placeholder="Search" :dense=true class="full-width" bg-color="white" :disable="controlState">
           <template v-slot:append>
             <q-icon v-if="searchTerm !== ''" name="close" @click="searchTerm = ''" class="cursor-pointer" />
           </template>
           <template v-slot:after>
-            <q-btn unelevated color="secondary" icon="search" @click="onSearch"/>
+            <q-btn unelevated color="secondary" icon="search" @click="onSearch" :disable="controlState" />
           </template>
         </q-input>
       </div>
@@ -70,8 +70,8 @@
       @setTitle="onNav"
       @singleProduct="isSingleProduct = $event"
       @priceFilter="saveBaseTicks($event)"
-      @deliveryWindow="deliveryWindow($event)"
-      @deliveryFrequency="deliveryFrequency($event)"
+      @deliveryWindow="deliveryWindows($event)"
+      @deliveryFrequency="deliveryFrequencies($event)"
       @creationDateInput="extraFilters.creation_date.inputs = $event"
       @activeDateInput="extraFilters.active.inputs = $event"
       @publishDateInput="extraFilters.publish.inputs = $event"
@@ -79,6 +79,7 @@
       :priceTicks="priceFilterTicks"
       :dwindow="deliveryWindowTicks"
       :dfrequency="deliveryFrequencyTicks"
+      @FiltersVisible="controlState = $event"
       />
 
     </q-page-container>
@@ -92,6 +93,7 @@ export default {
   name: 'MainLayout',
   data () {
     return {
+      controlState: false,
       title: '',
       tmp: [],
       priceFilterTicks: [],
@@ -165,6 +167,12 @@ export default {
       if (!(this.arrayEquals(this.priceFilterTicksBaseState, this.priceFilterTicks))) {
         this.filtered = this.applypriceFilters(this.filtered)
       }
+      if (!(this.arrayEquals(this.deliveryFrequencyTicks, this.deliveryFrequencyState))) {
+        this.filtered = this.applyFrequencyFilters(this.filtered)
+      }
+      if (!(this.arrayEquals(this.deliveryWindowTicks, this.deliveryWindowState))) {
+        this.filtered = this.applyWindowFilters(this.filtered)
+      }
       this.createFilter()
       this.setFilterValues()
       this.categories = this.$store.getters['brand/setCategories'](this.filtered)
@@ -229,6 +237,7 @@ export default {
     },
     applyFrequencyFilters (filtered) {
       const result = []
+      console.log('a')
       if (this.deliveryFrequencyTicks.length > 0) {
         const valid = filtered.filter(sku => sku.prices.length > 0)
         valid.forEach(sku => {
@@ -240,7 +249,7 @@ export default {
           }
         })
         return result
-      } else { return filtered }
+      } else { return [] }
     },
     applyWindowFilters (filtered) {
       const result = []
@@ -255,7 +264,7 @@ export default {
           }
         })
         return result
-      } else { return filtered }
+      } else { return [] }
     },
     saveBaseTicks (value) {
       if (this.priceFilterTicks.length < 1) {
@@ -263,17 +272,17 @@ export default {
       }
       this.priceFilterTicks = value.sort()
     },
-    deliveryFrequency (value) {
-      if (this.deliveryFrequency.length < 1) {
+    deliveryFrequencies (value) {
+      if (this.deliveryFrequencyTicks.length < 1) {
         this.deliveryFrequencyState = value.sort()
       }
-      this.deliveryFrequency = value.sort()
+      this.deliveryFrequencyTicks = value.sort()
     },
-    deliveryWindow (value) {
-      if (this.deliveryWindow.length < 1) {
+    deliveryWindows (value) {
+      if (this.deliveryWindowTicks.length < 1) {
         this.deliveryWindowState = value.sort()
       }
-      this.deliveryWindow = value.sort()
+      this.deliveryWindowTicks = value.sort()
     },
     resetTicks () {
       this.categories.forEach(cats => {
