@@ -1,5 +1,5 @@
 export function searchProducts (state) {
-  return (searchTerm, filter) => {
+  return (searchTerm) => {
     if (searchTerm === '' || searchTerm === null) {
       return state.products
     } else {
@@ -11,7 +11,7 @@ export function searchProducts (state) {
 export function getCategories (state) {
   const filter = []
   state.categories.forEach(c => {
-    filter.push({ name: c.name, id: c.id, sub_category: c.sub_category, show: true })
+    filter.push({ name: c.name, id: c.id, sub_category: c.sub_category })
   })
   return filter
 }
@@ -55,6 +55,6 @@ export function updateProducts (state) {
 function filterSearch (f, data) {
   const patt = new RegExp(f, 'i')
   return data.filter(product => {
-    return patt.test(product.name) && product.show
+    return patt.test(product.name)
   })
 }

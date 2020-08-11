@@ -19,20 +19,18 @@
                 </div>
               </div>
               <q-expansion-item label="Categories" icon="filter_list">
-                <categories-tree :categories="categories" @ticked="getTicks" @SetTicked="getTicks" />
+                <filters-view :filters="filters.categories" :ticks="ticks" :baseTicks="baseTicks" />
               </q-expansion-item>
-              <q-expansion-item label="Price" icon="filter_list" v-if="extraFilters.prices.delivery_dow.value.length > 0">
-                <q-expansion-item label="Delivery Dow" v-if="extraFilters.prices.delivery_dow.value.length > 0">
-                  <price-filter-tree :extraFilters="extraFilters" @tickedPriceFilters="$emit('priceFilter', $event)" :ticks="priceTicks" />
-                </q-expansion-item>
-                <q-expansion-item label="Delivery Frequency" v-if="extraFilters.prices.delivery_frequency.value.length > 0">
-                  <price-filter-generic-tree :prices="extraFilters.prices" :label="`Weekly`" @tickedPriceFilters="$emit('deliveryFrequency', $event)" :property="`delivery_frequency`" :ticks="dfrequency"/>
-                </q-expansion-item>
-                <q-expansion-item label="Delivery Window" v-if="extraFilters.prices.delivery_window.value.length > 0">
-                  <price-filter-generic-tree :prices="extraFilters.prices" :label="`24`" @tickedPriceFilters="$emit('deliveryWindow', $event)" :property="`delivery_window`" :ticks="dwindow"/>
-                </q-expansion-item>
+              <q-expansion-item label="Delivery Due" icon="filter_list">
+                <filters-view :filters="filters.delivery_dow" :ticks="ticks" :baseTicks="baseTicks" />
               </q-expansion-item>
-              <q-expansion-item label="Creation Date" icon="filter_list">
+              <q-expansion-item label="Delivery Window" icon="filter_list">
+                <filters-view :filters="filters.delivery_window" :ticks="ticks" :baseTicks="baseTicks" />
+              </q-expansion-item>
+              <q-expansion-item label="Delivery Frequency" icon="filter_list">
+                <filters-view :filters="filters.delivery_frequency" :ticks="ticks" :baseTicks="baseTicks" />
+              </q-expansion-item>
+              <!-- <q-expansion-item label="Creation Date" icon="filter_list">
                 <date-range :src_date="extraFilters.creation_date" @input="$emit('creationDateInput', $event)" />
               </q-expansion-item>
               <q-expansion-item label="Activation Date" icon="filter_list">
@@ -40,7 +38,7 @@
               </q-expansion-item>
               <q-expansion-item label="Publish Date" icon="filter_list">
                 <date-range :src_date="extraFilters.publish" @input="$emit('publishDateInput', $event)" />
-              </q-expansion-item>
+              </q-expansion-item> -->
             </div>
         </q-btn-dropdown>
         </div>
@@ -72,33 +70,22 @@
 </template>
 
 <script>
-import CategoriesTree from '../components/Categories.vue'
-import PriceFilterTree from '../components/PricesFilter.vue'
-import PriceFilterGenericTree from '../components/PricesFilterGeneric.vue'
-import DateRange from '../components/DateRange.vue'
+import FiltersView from '../components/FiltersView'
 
 export default {
-  props: ['filtered', 'loading', 'categories', 'extraFilters', 'priceTicks', 'dwindow', 'dfrequency'],
+  props: ['filtered', 'filters', 'ticks', 'loading', 'baseTicks'],
   components: {
-    CategoriesTree,
-    PriceFilterGenericTree,
-    PriceFilterTree,
-    DateRange
+    FiltersView
   },
   data () {
     return {
-      disabled: false,
-      ticks: []
+      disabled: false
     }
   },
   methods: {
     applyFilter () {
       this.$refs.fb.hide()
-      this.$emit('checkFilters', this.ticks)
-    },
-    getTicks (e) {
-      this.ticks = e
-      this.$emit('SetTicked', e)
+      this.$emit('applyFilters')
     },
     reset () {
       this.$refs.fb.hide()

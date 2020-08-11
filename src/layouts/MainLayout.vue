@@ -61,24 +61,15 @@
 
     <q-page-container>
       <router-view
-      :filtered="filtered"
+      :filtered="filteredResults"
+      :filters="filters"
       :loading="loading"
-      :categories="categories"
-      :extraFilters="extraFilters"
-      @checkFilters="onFilter"
-      @SetTicked="tmp = $event"
+      :ticks="ticks"
+      :baseTicks="baseTicks"
+      @applyFilters="onFiltered"
+      @reset="onReset"
       @setTitle="onNav"
       @singleProduct="isSingleProduct = $event"
-      @priceFilter="saveBaseTicks($event)"
-      @deliveryWindow="deliveryWindows($event)"
-      @deliveryFrequency="deliveryFrequencies($event)"
-      @creationDateInput="extraFilters.creation_date.inputs = $event"
-      @activeDateInput="extraFilters.active.inputs = $event"
-      @publishDateInput="extraFilters.publish.inputs = $event"
-      @reset="reset"
-      :priceTicks="priceFilterTicks"
-      :dwindow="deliveryWindowTicks"
-      :dfrequency="deliveryFrequencyTicks"
       @FiltersVisible="controlState = $event"
       />
 
@@ -95,51 +86,17 @@ export default {
     return {
       controlState: false,
       title: '',
-      tmp: [],
-      priceFilterTicks: [],
-      deliveryWindowTicks: [],
-      deliveryFrequencyTicks: [],
-      priceFilterTicksBaseState: [],
-      deliveryFrequencyState: [],
-      deliveryWindowState: [],
       searchTerm: '',
-      leftDrawerOpen: false,
-      filtered: [],
-      categories: [],
-      extraFilters: {
-        prices: {
-          delivery_dow: {
-            value: [],
-            ids: []
-          },
-          delivery_frequency: {
-            value: [],
-            ids: []
-          },
-          delivery_window: {
-            value: [],
-            ids: []
-          }
-        },
-        creation_date: {
-          dates: [],
-          min: '',
-          max: '',
-          inputs: { min: '', max: '' }
-        },
-        active: {
-          dates: [],
-          min: '',
-          max: '',
-          inputs: { min: '', max: '' }
-        },
-        publish: {
-          dates: [],
-          min: '',
-          max: '',
-          inputs: { min: '', max: '' }
-        }
+      searched: '',
+      filteredResults: [],
+      filters: {
+        categories: [],
+        delivery_dow: [],
+        delivery_frequency: [],
+        delivery_window: []
       },
+      ticks: [],
+      leftDrawerOpen: false,
       loading: true,
       isSingleProduct: false,
       links: [
@@ -148,162 +105,91 @@ export default {
       ]
     }
   },
+  computed: {
+    searchResults () {
+      return this.$store.getters['brand/searchProducts'](this.searchTerm)
+    },
+    categories () {
+      return this.$store.getters['brand/getCategories']
+    },
+    baseTicks () {
+      const ticks = []
+      this.searchResults.forEach(sku => { ticks.push(sku.id) })
+      return ticks
+    }
+  },
   methods: {
-    onSearch () {
-      this.categories = this.$store.getters['brand/getCategories']
-      this.filtered = this.$store.getters['brand/searchProducts'](this.searchTerm, this.tmp)
-      if (this.searchTerm === '') { this.reset() }
-      this.categories = this.$store.getters['brand/setCategories'](this.filtered)
-      this.createFilter()
-      this.setFilterValues()
-      this.seDateFilters()
-    },
-    onFilter (f) {
-      this.categories = this.$store.getters['brand/updateCategories'](f, this.categories)
-      this.filtered = this.$store.getters['brand/updateProducts'](f)
-      this.filtered = this.filterByDate(this.filtered, 'created_at', this.extraFilters.creation_date.inputs)
-      this.filtered = this.filterByDate(this.filtered, 'active', this.extraFilters.active.inputs)
-      this.filtered = this.filterByDate(this.filtered, 'publish', this.extraFilters.publish.inputs)
-      if (!(this.arrayEquals(this.priceFilterTicksBaseState, this.priceFilterTicks))) {
-        this.filtered = this.applypriceFilters(this.filtered)
-      }
-      if (!(this.arrayEquals(this.deliveryFrequencyTicks, this.deliveryFrequencyState))) {
-        this.filtered = this.applyFrequencyFilters(this.filtered)
-      }
-      if (!(this.arrayEquals(this.deliveryWindowTicks, this.deliveryWindowState))) {
-        this.filtered = this.applyWindowFilters(this.filtered)
-      }
-      this.createFilter()
-      this.setFilterValues()
-      this.categories = this.$store.getters['brand/setCategories'](this.filtered)
-    },
-    createFilter () {
-      const f = []
-      const g = []
-      const h = []
-      this.filtered.forEach(product => {
-        if (product.prices.length > 0) {
-          product.prices.forEach(price => {
-            f.push(price.delivery_dow)
-            g.push(price.delivery_frequency)
-            h.push(price.delivery_window)
-          })
-        }
-      })
-      const unique1 = new Set(f)
-      const unique2 = new Set(g)
-      const unique3 = new Set(h)
-      this.extraFilters.prices.delivery_dow.value = [...unique1]
-      this.extraFilters.prices.delivery_frequency.value = [...unique2]
-      this.extraFilters.prices.delivery_window.value = [...unique3]
-    },
-    setFilterValues () {
-      this.setPriceFilterValues('delivery_dow')
-      this.setPriceFilterValues('delivery_frequency')
-      this.setPriceFilterValues('delivery_window')
-    },
-    setPriceFilterValues (property) {
-      const ids = []
-      let tmpIDS = []
-      this.extraFilters.prices[property].value.forEach(value => {
-        tmpIDS = []
-        this.filtered.forEach(p => {
-          if (p.prices.length > 0) {
-            p.prices.forEach(id => {
-              if (id[property] === value) {
-                tmpIDS.push(id.id)
+    buildPriceFilter (property) {
+      this.filters[property] = []
+      //* Not all sku objects have a valid price array. Gather only those that are valid
+      const skus = this.searchResults.filter(sku => sku.prices.length)
+      if (skus.length) {
+        skus.forEach(sku => {
+          sku.prices.forEach(price => {
+            if (this.filters[property].length) {
+              const index = this.filters[property].findIndex(d => d.label === `${price[property]}`)
+              if (index === -1) {
+                this.filters[property].push({
+                  label: `${price[property]}`,
+                  id: `pf${price[property]}`,
+                  children: [{ label: sku.name, id: price.sku_id }]
+                })
+              } else {
+                const found = this.filters[property][index].children.findIndex(c => c.id === price.sku_id)
+                if (found === -1) {
+                  this.filters[property][index].children.push({ label: sku.name, id: price.sku_id })
+                }
               }
-            })
-          }
-        })
-        ids.push(tmpIDS)
-      })
-      this.extraFilters.prices[property].ids = ids
-    },
-    applypriceFilters (filtered) {
-      const result = []
-      if (this.priceFilterTicks.length > 0) {
-        const valid = filtered.filter(sku => sku.prices.length > 0)
-        valid.forEach(sku => {
-          for (let index = 0; index < sku.prices.length; index++) {
-            if (this.priceFilterTicks.some(id => id === sku.prices[index].id)) {
-              result.push(sku)
-              break
+            } else {
+              this.filters[property].push({
+                label: `${price[property]}`,
+                id: `pf${price[property]}`,
+                children: [{ label: sku.name, id: price.sku_id }]
+              })
             }
+          })
+        })
+      } else {
+        this.filters[property] = []
+      }
+    },
+    buildCategoryFilters () {
+      const a = this.categories.filter(category => this.searchResults.some(s => s.category.parent_id === category.id))
+      this.filters.categories = []
+      a.forEach(b => {
+        const children = []
+        b.sub_category.forEach(sub => {
+          const sku = this.searchResults.find(s => s.category_id === sub.id)
+          if (sku) {
+            children.push({ label: sub.name, id: sku.id })
           }
         })
-        return result
-      } else { return filtered }
-    },
-    applyFrequencyFilters (filtered) {
-      const result = []
-      console.log('a')
-      if (this.deliveryFrequencyTicks.length > 0) {
-        const valid = filtered.filter(sku => sku.prices.length > 0)
-        valid.forEach(sku => {
-          for (let index = 0; index < sku.prices.length; index++) {
-            if (this.deliveryFrequencyTicks.some(id => id === sku.prices[index].id)) {
-              result.push(sku)
-              break
-            }
-          }
-        })
-        return result
-      } else { return [] }
-    },
-    applyWindowFilters (filtered) {
-      const result = []
-      if (this.deliveryWindowTicks.length > 0) {
-        const valid = filtered.filter(sku => sku.prices.length > 0)
-        valid.forEach(sku => {
-          for (let index = 0; index < sku.prices.length; index++) {
-            if (this.deliveryWindowTicks.some(id => id === sku.prices[index].id)) {
-              result.push(sku)
-              break
-            }
-          }
-        })
-        return result
-      } else { return [] }
-    },
-    saveBaseTicks (value) {
-      if (this.priceFilterTicks.length < 1) {
-        this.priceFilterTicksBaseState = value.sort()
-      }
-      this.priceFilterTicks = value.sort()
-    },
-    deliveryFrequencies (value) {
-      if (this.deliveryFrequencyTicks.length < 1) {
-        this.deliveryFrequencyState = value.sort()
-      }
-      this.deliveryFrequencyTicks = value.sort()
-    },
-    deliveryWindows (value) {
-      if (this.deliveryWindowTicks.length < 1) {
-        this.deliveryWindowState = value.sort()
-      }
-      this.deliveryWindowTicks = value.sort()
-    },
-    resetTicks () {
-      this.categories.forEach(cats => {
-        cats.show = true
-        cats.sub_category.forEach(c => {
-          c.show = true
+        //* b.id is category ID of each Category, children's ID should be SKU id
+        this.filters.categories.push({
+          label: `${b.name} (${children.length})`,
+          id: b.id,
+          children: children
         })
       })
     },
-    seDateFilters () {
-      this.filtered.forEach(sku => {
-        this.extraFilters.creation_date.dates.push(sku.created_at)
-        this.extraFilters.active.dates.push(sku.active)
-        this.extraFilters.publish.dates.push(sku.publish)
-      })
-      this.extraFilters.creation_date.max = this.getMaxDate(this.extraFilters.creation_date.dates)
-      this.extraFilters.creation_date.min = this.getMinDate(this.extraFilters.creation_date.dates)
-      this.extraFilters.active.max = this.getMaxDate(this.extraFilters.active.dates)
-      this.extraFilters.active.min = this.getMinDate(this.extraFilters.active.dates)
-      this.extraFilters.publish.max = this.getMaxDate(this.extraFilters.publish.dates)
-      this.extraFilters.publish.min = this.getMinDate(this.extraFilters.publish.dates)
+    createFilters () {
+      this.buildCategoryFilters()
+      this.buildPriceFilter('delivery_dow')
+      this.buildPriceFilter('delivery_window')
+      this.buildPriceFilter('delivery_frequency')
+    },
+    onReset () {
+      this.ticks = this.baseTicks
+      this.filteredResults = this.$store.getters['brand/searchProducts'](this.searched)
+    },
+    onFiltered () {
+      this.filteredResults = this.searchResults.filter(result => this.ticks.some(tickID => tickID === result.id))
+    },
+    onSearch () {
+      this.searched = this.searchTerm
+      this.filteredResults = this.searchResults
+      this.ticks = this.baseTicks
+      this.createFilters()
     },
     getMaxDate (src) {
       let max = ''
@@ -325,14 +211,6 @@ export default {
       const date = new Date(min)
       return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
     },
-    resetDateFilters () {
-      this.extraFilters.creation_date.inputs.min = ''
-      this.extraFilters.active.inputs.min = ''
-      this.extraFilters.publish.inputs.min = ''
-      this.extraFilters.creation_date.inputs.max = ''
-      this.extraFilters.active.inputs.max = ''
-      this.extraFilters.publish.inputs.max = ''
-    },
     filterByDate (src, property, filter) {
       if (filter.min !== '') {
         return src.filter(sku => {
@@ -343,17 +221,6 @@ export default {
       } else {
         return src
       }
-    },
-    updateCategories () {
-      this.tmp = []
-      const x = this.categories
-      x.forEach(y => {
-        y.sub_category.forEach(s => {
-          if (s.show) {
-            this.tmp.push(s.id)
-          }
-        })
-      })
     },
     onNav (e) {
       this.title = e
@@ -368,26 +235,6 @@ export default {
       Array.isArray(b) &&
       a.length === b.length &&
       a.every((val, index) => val === b[index])
-    },
-    reset () {
-      this.resetTicks()
-      this.resetDateFilters()
-      if (this.priceFilterTicksBaseState.length > 0) {
-        this.priceFilterTicks = this.priceFilterTicksBaseState
-      }
-      if (this.deliveryFrequencyState.length > 0) {
-        this.deliveryFrequency = this.deliveryFrequencyState
-      }
-      if (this.deliveryWindowState.length > 0) {
-        this.deliveryWindow = this.deliveryWindowState
-      }
-      this.searchTerm = ''
-      this.categories = this.$store.getters['brand/getCategories']
-      this.filtered = this.$store.getters['brand/searchProducts'](this.searchTerm, this.tmp)
-      this.categories = this.$store.getters['brand/setCategories'](this.filtered)
-      this.createFilter()
-      this.setFilterValues()
-      this.seDateFilters()
     }
   },
   async created () {
@@ -395,8 +242,8 @@ export default {
     await this.$store.dispatch('brand/getProducts')
     await this.$store.dispatch('brand/getCategories')
     this.onSearch()
-    this.updateCategories()
     this.loading = false
+    this.$root.$on('ticked', (arg) => { this.ticks = arg })
   }
 }
 </script>
