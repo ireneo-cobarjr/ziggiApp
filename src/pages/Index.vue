@@ -30,15 +30,12 @@
               <q-expansion-item label="Delivery Frequency" icon="filter_list">
                 <filters-view :filters="filters.delivery_frequency" :ticks="ticks" :baseTicks="baseTicks" />
               </q-expansion-item>
-              <!-- <q-expansion-item label="Creation Date" icon="filter_list">
-                <date-range :src_date="extraFilters.creation_date" @input="$emit('creationDateInput', $event)" />
+              <q-expansion-item label="Creation Date" icon="filter_list">
+                <date-range :src_date="filters.created_at" @input="$emit('creationDateInput', $event)" :property="`created_at`" />
               </q-expansion-item>
               <q-expansion-item label="Activation Date" icon="filter_list">
-                <date-range :src_date="extraFilters.active" @input="$emit('activeDateInput', $event)" />
+                <date-range :src_date="filters.active" @input="$emit('activeDateInput', $event)" :property="`active`" />
               </q-expansion-item>
-              <q-expansion-item label="Publish Date" icon="filter_list">
-                <date-range :src_date="extraFilters.publish" @input="$emit('publishDateInput', $event)" />
-              </q-expansion-item> -->
             </div>
         </q-btn-dropdown>
         </div>
@@ -71,11 +68,13 @@
 
 <script>
 import FiltersView from '../components/FiltersView'
+import DateRange from '../components/DateRange'
 
 export default {
   props: ['filtered', 'filters', 'ticks', 'loading', 'baseTicks'],
   components: {
-    FiltersView
+    FiltersView,
+    DateRange
   },
   data () {
     return {

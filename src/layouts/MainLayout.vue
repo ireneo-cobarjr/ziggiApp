@@ -67,6 +67,8 @@
       :ticks="ticks"
       :baseTicks="baseTicks"
       @applyFilters="onFiltered"
+      @creationDateInput="onDateFiltered"
+      @activeDateInput="onDateFiltered"
       @reset="onReset"
       @setTitle="onNav"
       @singleProduct="isSingleProduct = $event"
@@ -93,7 +95,13 @@ export default {
         categories: [],
         delivery_dow: [],
         delivery_frequency: [],
-        delivery_window: []
+        delivery_window: [],
+        created_at: { min: '', max: '' },
+        active: { min: '', max: '' }
+      },
+      dateBaseState: {
+        created_at: { min: '', max: '' },
+        active: { min: '', max: '' }
       },
       ticks: [],
       leftDrawerOpen: false,
@@ -119,6 +127,15 @@ export default {
     }
   },
   methods: {
+    buildDateFilters (property) {
+      const set = []
+      this.searchResults.forEach(sr => {
+        set.push(sr[property])
+      })
+      this.filters[property].min = this.getMinDate(set)
+      this.filters[property].max = this.getMaxDate(set)
+      this.dateBaseState[property] = this.filters[property]
+    },
     buildPriceFilter (property) {
       this.filters[property] = []
       //* Not all sku objects have a valid price array. Gather only those that are valid
@@ -177,9 +194,18 @@ export default {
       this.buildPriceFilter('delivery_dow')
       this.buildPriceFilter('delivery_window')
       this.buildPriceFilter('delivery_frequency')
+      this.buildDateFilters('created_at')
+      this.buildDateFilters('active')
+    },
+    onDateFiltered (x) {
+      const { property, arg } = x
+      this.filters[property] = arg
+      this.filterByDate(this.searchResults, property, this.filters[property])
     },
     onReset () {
       this.ticks = this.baseTicks
+      this.filters.active = this.dateBaseState.active
+      this.filters.created_at = this.dateBaseState.created_at
       this.filteredResults = this.$store.getters['brand/searchProducts'](this.searched)
     },
     onFiltered () {
@@ -212,15 +238,19 @@ export default {
       return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
     },
     filterByDate (src, property, filter) {
+      let test = []
       if (filter.min !== '') {
-        return src.filter(sku => {
+        test = src.filter(sku => {
           const s = new Date(sku[property])
           const x = new Date(`${s.getFullYear()}/${s.getMonth() + 1}/${s.getDate()}`)
           return (x >= (new Date(filter.min)) && x <= (new Date(filter.max)))
         })
       } else {
-        return src
+        test = src
       }
+      this.ticks = []
+      test.forEach(t => { this.ticks.push(t.id) })
+      this.$root.$emit('dateFiltered', this.ticks)
     },
     onNav (e) {
       this.title = e
@@ -229,12 +259,6 @@ export default {
     back () {
       this.isSingleProduct = false
       this.$router.go(-1)
-    },
-    arrayEquals (a, b) {
-      return Array.isArray(a) &&
-      Array.isArray(b) &&
-      a.length === b.length &&
-      a.every((val, index) => val === b[index])
     }
   },
   async created () {

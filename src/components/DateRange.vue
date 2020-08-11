@@ -1,9 +1,9 @@
 <template>
   <div class="q-py-sm q-px-md text-center">
     <span>From:</span><span>{{`${min}`}}</span>
-    <q-btn flat round icon="event" class="1-ml-md">
+    <q-btn flat round icon="event" class="1-ml-md" color="primary">
       <q-popup-proxy transition-show="scale" transition-hide="scale">
-        <q-date v-model="min_date" minimal :options="minOptions" @input="input" default-year-month="2020/08">
+        <q-date v-model="min_date" minimal :options="minOptions" @input="input">
           <div class="row items-center justify-end q-gutter-sm">
             <q-btn label="Close" color="primary" flat v-close-popup />
           </div>
@@ -11,9 +11,9 @@
       </q-popup-proxy>
     </q-btn> <br>
     <span>To:</span><span>{{`${max}`}}</span>
-    <q-btn flat round icon="event" class="1-ml-md">
+    <q-btn flat round icon="event" class="1-ml-md" color="primary">
       <q-popup-proxy transition-show="scale" transition-hide="scale">
-        <q-date v-model="max_date" minimal :options="maxOptions" @input="input" default-year-month="2020/08">
+        <q-date v-model="max_date" minimal :options="maxOptions" @input="input">
           <div class="row items-center justify-end q-gutter-sm">
             <q-btn label="Close" color="primary" flat v-close-popup />
           </div>
@@ -26,7 +26,7 @@
 
 <script>
 export default {
-  props: ['src_date'],
+  props: ['src_date', 'property'],
   data () {
     return {
       min_date: this.src_date.min,
@@ -51,7 +51,10 @@ export default {
       return date >= this.min_date
     },
     input () {
-      this.$emit('input', { min: this.min_date, max: this.max_date })
+      this.$emit('input', {
+        arg: { min: this.min_date, max: this.max_date },
+        property: this.property
+      })
     }
   }
 }

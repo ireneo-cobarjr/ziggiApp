@@ -66,6 +66,16 @@ export default {
         this.selectAll = null
       }
     })
+    this.$root.$on('dateFiltered', e => {
+      this.ticked = e
+      if (this.checkTicks(e)) {
+        this.selectAll = true
+      } else if (this.ticked.length === 0) {
+        this.selectAll = false
+      } else {
+        this.selectAll = null
+      }
+    })
   }
 }
 </script>
