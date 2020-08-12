@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 // import store modules
 import outlets from './outlets'
-import products from './products'
+import customer from './customer'
 import brand from './brand'
 import auth from './auth'
 
@@ -22,7 +22,7 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       outlets,
-      products,
+      customer,
       brand,
       auth
     },

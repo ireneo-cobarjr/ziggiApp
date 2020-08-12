@@ -2,11 +2,25 @@
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    redirect: '/brand',
+    component: () => import('layouts/BaseLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/Index.vue'), meta: { isSecured: true } },
-      { path: 'product/:id', component: () => import('pages/ProductView.vue'), meta: { isSecured: true }, props: true },
-      { path: 'outlets', component: () => import('pages/Outlets.vue'), meta: { isSecured: true } }
+      {
+        path: 'brand',
+        component: () => import('layouts/BrandLayout.vue'),
+        children: [
+          { path: '', component: () => import('pages/Brand.vue'), meta: { isSecured: true } },
+          { path: 'product/:id', component: () => import('pages/ProductView.vue'), meta: { isSecured: true }, props: true },
+          { path: 'outlets', component: () => import('pages/Outlets.vue'), meta: { isSecured: true } }
+        ]
+      },
+      {
+        path: 'customer',
+        component: () => import('layouts/CustomerLayout.vue'),
+        children: [
+          { path: '', component: () => import('pages/Customer.vue'), meta: { isSecured: true } }
+        ]
+      }
     ]
   },
   {

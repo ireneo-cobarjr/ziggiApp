@@ -1,12 +1,9 @@
 export function searchProducts (state) {
-  return (searchTerm, filter) => {
+  return (searchTerm) => {
     if (searchTerm === '' || searchTerm === null) {
       return state.products
     } else {
-      const patt = new RegExp(searchTerm, 'i')
-      return state.products.filter(product => {
-        return patt.test(product.name) && product.show
-      })
+      return filterSearch(searchTerm, state.products)
     }
   }
 }
@@ -14,9 +11,9 @@ export function searchProducts (state) {
 export function getCategories (state) {
   const filter = []
   state.categories.forEach(c => {
-    filter.push({ name: c.name, id: c.id, sub_category: c.sub_category, show: true })
+    filter.push({ name: c.name, id: c.id, sub_category: c.sub_category })
   })
-  return filter.filter(e => true)
+  return filter
 }
 
 export function getProduct (state) {
@@ -46,10 +43,18 @@ export function updateCategories () {
   }
 }
 
-export function updateProducts () {
-  return (f, p) => {
-    return p.filter(product => {
+export function updateProducts (state) {
+  return (f) => {
+    return state.products.filter(product => {
       return f.some(id => id === product.category_id)
     })
   }
+}
+
+// Helper functions
+function filterSearch (f, data) {
+  const patt = new RegExp(f, 'i')
+  return data.filter(product => {
+    return patt.test(product.name)
+  })
 }

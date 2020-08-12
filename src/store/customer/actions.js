@@ -6,10 +6,7 @@ export async function getProducts ({ commit, dispatch, rootState }) {
     dispatch('auth/relogin', null, { root: true })
   }
 
-  await axios.get(api.products, {
-    params: {
-      XDEBUG_SESSION_START: 'PHPSTORM'
-    },
+  await axios.get(api.customer.sku, {
     headers: {
       Authorization: `Bearer ${rootState.auth.token}`
     }
@@ -30,7 +27,7 @@ export async function getCategories ({ commit, dispatch, rootState }) {
     dispatch('auth/relogin', null, { root: true })
   }
 
-  await axios.get(api.categories, {
+  await axios.get(api.customer.categories, {
     headers: {
       Authorization: `Bearer ${rootState.auth.token}`
     }

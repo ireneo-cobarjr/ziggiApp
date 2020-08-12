@@ -10,12 +10,14 @@ const instance = axios.create({
 
 const api = {
   login: '/login',
-  products: '/customer/sku/list',
-  categories: '/customer/category/list',
   outlets: '/outlet/list',
   brand: {
     sku: '/brand/sku/list',
     categories: '/brand/category/list'
+  },
+  customer: {
+    sku: '/customer/sku/list',
+    categories: '/customer/category/list'
   }
 }
 

@@ -17,7 +17,7 @@
           round
           icon="menu"
           aria-label="Menu"
-          @click="leftDrawerOpen = !leftDrawerOpen"
+          @click="$emit('drawerClicked')"
           v-else
         />
 
@@ -41,24 +41,6 @@
       </div>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-      content-class="bg-grey-1"
-    >
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          <p class="text-primary text-h5 text-weight-bold">Ziggi</p>
-        </q-item-label>
-        <Links v-for="(link, index) in links" :key="index" :title="link.title" :caption="link.caption" :link="link.link" :icon="link.icon" />
-
-      </q-list>
-    </q-drawer>
-
     <q-page-container>
       <router-view
       :filtered="filteredResults"
@@ -80,9 +62,7 @@
 </template>
 
 <script>
-import Links from '../components/EssentialLink.vue'
 export default {
-  components: { Links },
   name: 'MainLayout',
   data () {
     return {
@@ -104,13 +84,8 @@ export default {
         active: { min: '', max: '' }
       },
       ticks: [],
-      leftDrawerOpen: false,
       loading: true,
-      isSingleProduct: false,
-      links: [
-        { title: 'Brand', link: '/', caption: '', icon: 'shopping_basket' },
-        { title: 'Outlets', link: '/outlets', caption: '', icon: 'store' }
-      ]
+      isSingleProduct: false
     }
   },
   computed: {
@@ -169,6 +144,9 @@ export default {
       } else {
         this.filters[property] = []
       }
+      this.filters[property].forEach(pf => {
+        pf.label = `${pf.label} (${pf.children.length})`
+      })
     },
     buildCategoryFilters () {
       const a = this.categories.filter(category => this.searchResults.some(s => s.category.parent_id === category.id))
