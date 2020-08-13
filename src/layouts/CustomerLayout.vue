@@ -17,6 +17,7 @@
           round
           icon="menu"
           aria-label="Menu"
+          :disable="controlState"
           @click="$emit('drawerClicked')"
           v-else
         />
@@ -29,7 +30,7 @@
           <q-icon name="shopping_cart" size="sm" />
         </div>
       </q-toolbar>
-      <div class="row q-px-sm q-pt-sm" v-if="$route.path === '/'">
+      <div class="row q-px-sm q-pt-sm" v-if="$route.path === '/customer'">
         <q-input outlined bottom-slots v-model="searchTerm" placeholder="Search" :dense=true class="full-width" bg-color="white" :disable="controlState">
           <template v-slot:append>
             <q-icon v-if="searchTerm !== ''" name="close" @click="searchTerm = ''" class="cursor-pointer" />
@@ -196,20 +197,28 @@ export default {
       this.createFilters()
     },
     getMaxDate (src) {
-      let max = ''
-      for (let x = 0; x < (src.length - 1); x++) {
-        for (let y = (src.length - 1); y !== x; y--) {
-          ((new Date(src[x])) > (new Date(src[y]))) ? max = src[x] : max = src[y]
+      let max = src[0]
+      for (let x = 1; x < (src.length - 1); x++) {
+        const MAX = new Date(max)
+        const dateB = new Date(src[x])
+        const txtA = new Date(`${MAX.getFullYear()}/${MAX.getMonth() + 1}/${MAX.getDate()}`)
+        const txtB = new Date(`${dateB.getFullYear()}/${dateB.getMonth() + 1}/${dateB.getDate()}`)
+        if (txtB > txtA) {
+          max = src[x]
         }
       }
       const date = new Date(max)
       return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
     },
     getMinDate (src) {
-      let min = ''
-      for (let x = 0; x < (src.length - 1); x++) {
-        for (let y = (src.length - 1); y !== x; y--) {
-          ((new Date(src[x])) < (new Date(src[y]))) ? min = src[x] : min = src[y]
+      let min = src[0]
+      for (let x = 1; x < (src.length - 1); x++) {
+        const MIN = new Date(min)
+        const dateB = new Date(src[x])
+        const txtA = new Date(`${MIN.getFullYear()}/${MIN.getMonth() + 1}/${MIN.getDate()}`)
+        const txtB = new Date(`${dateB.getFullYear()}/${dateB.getMonth() + 1}/${dateB.getDate()}`)
+        if (txtB < txtA) {
+          min = src[x]
         }
       }
       const date = new Date(min)
@@ -226,6 +235,7 @@ export default {
       } else {
         test = src
       }
+      console.log(test)
       this.ticks = []
       test.forEach(t => { this.ticks.push(t.id) })
       this.$root.$emit('dateFiltered', this.ticks)

@@ -48,6 +48,8 @@
               <q-item-label class="text-weight-bold">{{item.name}}</q-item-label>
               <q-item-label caption>{{`Auto Order: ${item.auto_order}`}}</q-item-label>
               <q-item-label caption>{{`VAT: ${item.vat}`}}</q-item-label>
+              <q-item-label caption>{{`Created: ${formatDate(item.created_at)}`}}</q-item-label>
+              <q-item-label caption>{{`Active: ${formatDate(item.active)}`}}</q-item-label>
               <span>SKU: {{item.id}}</span>
               <q-expansion-item :label="`Vendor (${item.vendors.length})`" icon="store" dense class="q-mt-md" style="margin-left: -1rem">
                 <div v-if="item.vendors.length < 1" class="q-pl-md">(None)</div>
@@ -97,6 +99,10 @@ export default {
     hideFilters () {
       this.disabled = false
       this.$emit('FiltersVisible', this.disabled)
+    },
+    formatDate (s) {
+      const stringDate = new Date(s)
+      return `${stringDate.getFullYear()}/${stringDate.getMonth() + 1}/${stringDate.getDate()}`
     }
   },
   mounted () {

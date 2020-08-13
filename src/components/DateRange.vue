@@ -29,8 +29,8 @@ export default {
   props: ['src_date', 'property'],
   data () {
     return {
-      min_date: this.src_date.min,
-      max_date: this.src_date.max
+      min_date: '',
+      max_date: ''
     }
   },
   computed: {
@@ -56,6 +56,10 @@ export default {
         property: this.property
       })
     }
+  },
+  mounted () {
+    this.min_date = this.src_date.min
+    this.max_date = this.src_date.max
   }
 }
 </script>
